@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRAM · Калькулятор подарков</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0; padding: 0;
+    min-height: 100vh;
+    color: #e6edf7;
+    background:
+      radial-gradient(900px 480px at 88% -12%, rgba(56,189,248,.22), transparent 60%),
+      radial-gradient(760px 440px at -12% 112%, rgba(251,191,36,.10), transparent 60%),
+      linear-gradient(160deg, #0b1220 0%, #0f172a 55%, #10263b 100%);
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 26px 18px 60px; }
+
+  /* ---------- Шапка ---------- */
+  .app-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .gram-coin { width: 58px; height: 58px; filter: drop-shadow(0 4px 14px rgba(66,198,255,.45)); }
+  h1 { margin: 0; font-size: 22px; letter-spacing: .3px; color: #f1f5f9; }
+  h1 .accent {
+    background: linear-gradient(90deg, #43c6ff, #7dd3fc 55%, #fbbf24);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .subtitle { font-size: 12px; color: #8ba3c7; margin-top: 4px; }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: #dce8f8;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px; border-radius: 999px;
+  }
+  .chip .icon { width: 15px; height: 15px; margin-right: 0; }
+  .chipv { color: #7dd3fc; font-weight: 700; }
+
+  /* ---------- Иконки ---------- */
+  .icon { width: 19px; height: 19px; vertical-align: -4px; margin-right: 7px; flex-shrink: 0; }
+
+  /* ---------- Таблица ---------- */
+  table { width: 100%; border-collapse: collapse; background: rgba(13,20,34,.78); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,.35); }
+  tr { border-bottom: 1px solid rgba(255,255,255,.06); }
+  tr:last-child { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255,255,255,.03); }
+  td, th { padding: 12px 14px; text-align: left; }
+  th { background: rgba(255,255,255,.05); color: #93c5fd; font-weight: 600; }
+  td.label { font-weight: 600; width: 58%; font-size: 14px; color: #cfe1fa; }
+  .lbl { display: inline-block; }
+  .sub { display: block; font-weight: 400; font-size: 11px; color: #6f87ad; margin-top: 3px; }
+  .gram-name { color: #43c6ff; }
+  .old-name { color: #8ba3c7; font-weight: 400; }
+
+  /* ---------- Поля ---------- */
+  input {
+    width: 100%; padding: 9px 11px;
+    font-size: 15px; color: #eef4ff;
+    background: #0d1526;
+    border: 1px solid #24365a; border-radius: 8px;
+  }
+  input:read-only { background: #0a1120; color: #9dbff0; }
+  input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.22); }
+  input::placeholder { color: #54698c; }
+
+  /* ---------- Кнопки ---------- */
+  button {
+    margin-top: 14px; width: 100%; padding: 13px;
+    font-size: 16px; font-weight: 700; color: #fff;
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    border: none; border-radius: 10px; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(37,99,235,.40);
+  }
+  button:hover { filter: brightness(1.1); }
+  button:active { transform: translateY(1px); }
+
+  /* ---------- Сообщения ---------- */
+  .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 14px; line-height: 1.55; }
+  .ok { background: rgba(22,163,74,.14); color: #86efac; border: 1px solid rgba(34,197,94,.35); }
+  .err, .no { background: rgba(239,68,68,.12); color: #fca5a5; border: 1px solid rgba(239,68,68,.35); }
+
+  /* ---------- Топ ---------- */
+  .top-wrap { margin-top: 22px; }
+  .top-wrap h3 { font-size: 16px; margin: 0 0 10px; color: #f1f5f9; }
+  .top-wrap td { border-bottom: 1px solid rgba(255,255,255,.06); }
+
+  .note { font-size: 12px; color: #7f97ba; margin: 0 0 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app-header">
+    <div class="brand">
+      <svg class="gram-coin" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="gg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f5cf6a"/><stop offset="1" stop-color="#e8a011"/>
+          </linearGradient>
+          <linearGradient id="gg2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#43c6ff"/><stop offset="1" stop-color="#1489e3"/>
+          </linearGradient>
+          <linearGradient id="gg3" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#43c6ff"/><stop offset="1" stop-color="#12a5cf"/>
+          </linearGradient>
+        </defs>
+        <circle cx="32" cy="32" r="31" fill="url(#gg1)"/>
+        <circle cx="32" cy="32" r="25.5" fill="url(#gg2)"/>
+        <path d="M32 16 L45.5 32 L32 48 L18.5 32 Z" fill="#ffffff" opacity=".95"/>
+        <path d="M32 23.5 L39.5 32 L32 40.5 L24.5 32 Z" fill="url(#gg3)"/>
+      </svg>
+      <div>
+        <h1>GRAM · <span class="accent">Калькулятор подарков</span></h1>
+        <div class="subtitle">Монета GRAM (ранее TON) · спотовая цена с Bybit · курс ₽ вводишь вручную</div>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#e8a011"/><circle cx="32" cy="32" r="25.5" fill="#1489e3"/><path d="M32 16 L45.5 32 L32 48 L18.5 32 Z" fill="#fff" opacity=".95"/><path d="M32 23.5 L39.5 32 L32 40.5 L24.5 32 Z" fill="#1489e3"/></svg><span class="chipv" id="chipGram">$ –</span></span>
+      <span class="chip"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#16a34a"/><text x="12" y="17.2" font-family="Segoe UI, Arial" font-weight="bold" font-size="13" fill="#fff" text-anchor="middle">$</text></svg><span class="chipv" id="chipUsd">USDT</span></span>
+      <span class="chip"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.2" y="2.2" width="19.6" height="19.6" rx="5.5" fill="#ea580c"/><text x="12" y="17.6" font-family="Segoe UI, Arial" font-weight="bold" font-size="11" fill="#fff" text-anchor="middle">₽</text></svg><span class="chipv" id="chipRub">₽ –</span></span>
+      <span class="chip"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10" width="18" height="11" rx="1.8" fill="#f43f5e"/><rect x="2.4" y="6" width="19.2" height="4" rx="1.8" fill="#e11d48"/><rect x="10.8" y="6" width="2.4" height="15" fill="#fbbf24"/><path d="M12 6 C9 1.5 3.5 3.5 4.5 7.5 C5.5 10.5 10 9.5 12 6 Z" fill="#e11d48"/><path d="M12 6 C15 1.5 20.5 3.5 19.5 7.5 C18.5 10.5 14 9.5 12 6 Z" fill="#e11d48"/></svg><span>Подарок</span></span>
+    </div>
+  </header>
+  <p class="note">Строка 1 — курс доллара вводишь вручную (например, по P2P). Строка 2 — спотовая цена GRAM/USDT с Bybit автоматически. Строки 3–5 вводишь каждый раз.</p>
+
+  <table>
+    <tr><td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.2" y="2.2" width="19.6" height="19.6" rx="5.5" fill="#ea580c"/><text x="12" y="17.6" font-family="Segoe UI, Arial" font-weight="bold" font-size="11" fill="#fff" text-anchor="middle">₽</text></svg>1. Курс доллара к рублю</span><span class="sub">Вводишь вручную — например, актуальный курс P2P</span></td><td><input id="kurs" type="number" min="0" step="any" placeholder="0"></td></tr>
+    <tr>
+      <td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#e8a011"/><circle cx="32" cy="32" r="25.5" fill="#1489e3"/><path d="M32 16 L45.5 32 L32 48 L18.5 32 Z" fill="#fff" opacity=".95"/><path d="M32 23.5 L39.5 32 L32 40.5 L24.5 32 Z" fill="#1489e3"/></svg>2. Стоимость монеты — <b class="gram-name">GRAM</b> <span class="old-name">(ранее TON)</span></span><span class="sub">Авто-импорт спотовой цены GRAM/USDT с Bybit · обновление каждые 60 сек</span></td>
+      <td>
+        <div style="display:flex; gap:6px;">
+          <input id="cena" readonly>
+          <button type="button" onclick="refreshGramRate()" style="width:auto; margin:0; padding:8px 12px; flex-shrink:0;" title="Обновить курс сейчас">⟳</button>
+        </div>
+        <div id="rateStatus" style="font-size:11px; color:#77808f; margin-top:4px;"></div>
+      </td>
+    </tr>
+    <tr><td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="6.2" fill="#f59e0b" stroke="#b45309" stroke-width="1"/><path d="M7 10.8 a5 5 0 0 0 10 0 v1.8 a5 5 0 0 1 -10 0 Z" fill="#d97706"/></svg>3. Сколько монет потратил</span></td><td><input id="coins" type="number" min="0" step="any" placeholder="0"></td></tr>
+    <tr>
+      <td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#16a34a"/><text x="12" y="17.2" font-family="Segoe UI, Arial" font-weight="bold" font-size="13" fill="#fff" text-anchor="middle">$</text></svg>4. Стоимость продажи (значение X)</span><span class="sub">Из X вычитается 10%, затем ещё 6%</span></td>
+      <td><input id="x" type="number" min="0" step="any" placeholder="0"></td>
+    </tr>
+    <tr><td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10" width="18" height="11" rx="1.8" fill="#f43f5e"/><rect x="2.4" y="6" width="19.2" height="4" rx="1.8" fill="#e11d48"/><rect x="10.8" y="6" width="2.4" height="15" fill="#fbbf24"/><path d="M12 6 C9 1.5 3.5 3.5 4.5 7.5 C5.5 10.5 10 9.5 12 6 Z" fill="#e11d48"/><path d="M12 6 C15 1.5 20.5 3.5 19.5 7.5 C18.5 10.5 14 9.5 12 6 Z" fill="#e11d48"/></svg>5. Название подарка</span></td><td><input id="gname" placeholder="Например: Бык Дикого леса"></td></tr>
+  </table>
+
+  <button onclick="add()">Рассчитать</button>
+
+  <div id="result"></div>
+
+  <div class="top-wrap" id="topWrap"></div>
+</div>
+
+<script>
+  // ================== КОНСТАНТЫ ==================
+  // Строка 1 — только НАЧАЛЬНОЕ значение курса доллара к рублю.
+  // В приложении это поле можно менять вручную когда угодно:
+  const KURS_DOLLARA = 91.5;          // курс доллара к рублю (по умолчанию)
+  // Строка 2 — импортируется автоматически (GRAM/USDT с биржи).
+  // Ниже запасное значение на случай отсутствия интернета/ошибки API:
+  const CENA_MONETY_FALLBACK = 1.35;  // $ за 1 монету (GRAM)
+  // ================================================
+
+  let cenaMonety = CENA_MONETY_FALLBACK; // актуальный курс монеты к доллару
+  const gifts = [];
+
+  function load() {
+    document.getElementById('kurs').value = String(KURS_DOLLARA);
+    refreshGramRate();                          // загрузить курс сразу
+    setInterval(refreshGramRate, 60000);        // авто-обновление каждую минуту
+  }
+
+  function add() {
+    const coins = parseFloat(document.getElementById('coins').value);
+    const x     = parseFloat(document.getElementById('x').value);
+    const kurs  = parseFloat(document.getElementById('kurs').value);
+    const name  = document.getElementById('gname').value.trim();
+
+    if (!(kurs > 0) || !(coins > 0) || !(x > 0) || !name) {
+      document.getElementById('result').innerHTML =
+        '<div class="msg err">❌ Проверь строки 1, 3, 4 и 5 — введены некорректные значения.</div>';
+      return;
+    }
+
+    const salePrice = x * 0.9 * 0.94;                      // цена продажи после 10% и 6%
+    const cost      = coins * cenaMonety * kurs;          // потрачено в рублях
+    const diff      = salePrice - cost;                    // разница
+
+    if (diff > 0) {
+      gifts.push({ name: name, diff: diff, salePrice: salePrice, cost: cost });
+      gifts.sort(function (a, b) { return b.diff - a.diff; }); // топ: больше разница — выше
+      document.getElementById('result').innerHTML =
+        '<div class="msg ok">✅ Подарок: <b>' + esc(name) + '</b> — разница <b>' + fmt(diff) +
+        ' ₽</b><br><span style="font-size:13px">Цена продажи: ' + fmt(salePrice) +
+        ' ₽ &nbsp;·&nbsp; Потрачено: ' + fmt(cost) + ' ₽</span></div>';
+    } else {
+      document.getElementById('result').innerHTML =
+        '<div class="msg no">⛔ <b>' + esc(name) + '</b> — разница ' + fmt(diff) +
+        ' ₽ (не положительная), в топ не попал.</div>';
+    }
+    renderTop();
+    syncChips();
+    // Очистить строки 3–5 для следующего ввода
+    document.getElementById('coins').value = '';
+    document.getElementById('x').value = '';
+    document.getElementById('gname').value = '';
+    document.getElementById('coins').focus();
+  }
+
+  function renderTop() {
+    const wrap = document.getElementById('topWrap');
+    if (!gifts.length) { wrap.innerHTML = ''; return; }
+    let html = '<h3>🏆 Топ подарков</h3><table><tr><th>#</th><th>Подарок</th><th>Разница</th></tr>';
+    gifts.forEach(function (g, i) {
+      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(g.name) + '</td><td><b>' + fmt(g.diff) + ' ₽</b></td></tr>';
+    });
+    html += '</table>';
+    wrap.innerHTML = html;
+  }
+
+  function fmt(v) {
+    return v.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Показывает актуальные значения в иконках-чипсах шапки
+  function syncChips() {
+    var cg = document.getElementById('chipGram');
+    if (cg) cg.textContent = '$' + cenaMonety;
+    var cr = document.getElementById('chipRub');
+    if (cr) {
+      var kv = parseFloat(document.getElementById('kurs').value);
+      cr.textContent = kv > 0 ? ('₽ ' + kv) : '₽ —';
+    }
+  }
+
+  // ============ ИМПОРТ КУРСА GRAM/USDT ============
+  // Основной источник — спотовая цена Bybit.
+  // При её недоступности — запасные: Binance → OKX.
+  const RATE_SOURCES = [
+    { name: 'Bybit',
+      url:  'https://api.bybit.com/v5/market/tickers?category=spot&symbol=GRAMUSDT',
+      parse: function (d) { return parseFloat(d.result.list[0].lastPrice); } },
+    { name: 'Binance',
+      url:  'https://api.binance.com/api/v3/ticker/price?symbol=GRAMUSDT',
+      parse: function (d) { return parseFloat(d.price); } },
+    { name: 'OKX',
+      url:  'https://www.okx.com/api/v5/market/ticker?instId=GRAM-USDT',
+      parse: function (d) { return parseFloat(d.data[0].last); } }
+  ];
+
+  async function refreshGramRate() {
+    const cenaEl    = document.getElementById('cena');
+    const statusEl  = document.getElementById('rateStatus');
+    for (const src of RATE_SOURCES) {
+      try {
+        const resp = await fetch(src.url);
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        const price = src.parse(data);
+        if (!(price > 0)) continue;
+        cenaMonety = price;
+        cenaEl.value = String(price.toFixed(4));
+        if (typeof syncChips === 'function') syncChips();
+        statusEl.textContent = '✓ Курс GRAM/USDT: $' + price +
+          ' (источник: ' + src.name + ', ' + new Date().toLocaleTimeString('ru-RU') + ')';
+        statusEl.style.color = '#166534';
+        return;
+      } catch (e) { /* пробуем следующий источник */ }
+    }
+    cenaMonety = CENA_MONETY_FALLBACK;
+    cenaEl.value = String(CENA_MONETY_FALLBACK);
+    if (typeof syncChips === 'function') syncChips();
+    statusEl.textContent = '⚠ Ошибка загрузки курса — используется запасное значение $' +
+      CENA_MONETY_FALLBACK + ' (Bybit, Binance и OKX недоступны)';
+    statusEl.style.color = '#b45309';
+  }
+
+  load();
+</script>
+</body>
+</html>

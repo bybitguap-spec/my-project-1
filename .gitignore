@@ -25,6 +25,11 @@
 crashlytics-build.properties
 sysinfo.txt
 
+# ===== Временное (мои служебные файлы) =====
+_tmp_profile/
+_dom_dump.html
+_jscheck.js
+
 # ===== OS =====
 .DS_Store
 Desktop.ini

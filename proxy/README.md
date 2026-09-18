@@ -48,7 +48,21 @@ python -m venv .venv
 # http://127.0.0.1:8787/api/floor?gift=Toy%20Bear&model=Wizard
 ```
 
-## Деплой на Vercel
+## Деплой на Vercel (вариант А — через сайт, ~3 минуты, без установки)
+
+1. Откройте https://vercel.com и войдите (можно через GitHub).
+2. **Add New… → Project → Import** — выберите свой форк этого репозитория
+   (или залейте туда только папку `proxy` как отдельный репозиторий, root directory = `proxy`).
+3. На шаге **Configure Project** ничего менять не нужно: Vercel сам определит
+   Python-функцию `api/floor.py` и поставит зависимости из `requirements.txt`.
+   Настройки функции (`vercel.json`): runtime `python3.12`, timeout 30 сек, память 1024 МБ.
+4. Нажмите **Deploy**. После деплоя получите домен вида `https://<project>.vercel.app`.
+5. Проверка: `https://<project>.vercel.app/api/floor?gift=Toy%20Bear&model=Wizard`
+   → должен прийти JSON с `"ok": true, "floor": ...`.
+6. Прокси-URL вставляется в сайт (`https://<project>.vercel.app/api/floor`) —
+   скажите мне этот адрес, и я подключу к нему `gifts-calculator.html`.
+
+## Деплой на Vercel (вариант Б — через терминал)
 
 ```bash
 npm i -g vercel

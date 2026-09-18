@@ -91,6 +91,28 @@
   .top-wrap td { border-bottom: 1px solid rgba(255,255,255,.06); }
 
   .note { font-size: 12px; color: #7f97ba; margin: 0 0 14px; }
+
+  /* ---------- Список сохранённых подарков (NFT) ---------- */
+  .top-wrap .cnt {
+    font-size: 12px; font-weight: 700; color: #7dd3fc;
+    background: rgba(125,211,252,.12); border: 1px solid rgba(125,211,252,.35);
+    border-radius: 999px; padding: 2px 9px; vertical-align: 2px; margin-left: 6px;
+  }
+  .top-wrap th, .top-wrap td { font-size: 13px; padding: 10px 12px; }
+  .top-wrap td.pos { color: #86efac; }
+  .top-wrap td.neg { color: #fca5a5; }
+  tr.totals { background: rgba(59,130,246,.10); }
+  tr.totals td { border-top: 1px solid rgba(255,255,255,.16); font-weight: 700; }
+  button.del {
+    margin: 0; width: auto; padding: 4px 10px; font-size: 14px; line-height: 1.2;
+    background: #7f1d1d; box-shadow: none;
+  }
+  button.del:hover { background: #991b1b; filter: none; }
+  button.clear {
+    margin-top: 12px; font-size: 14px; background: #334155; box-shadow: none;
+  }
+  button.clear:hover { background: #41556f; filter: none; }
+  .store-hint { margin: 12px 0 0; font-size: 12px; color: #7f97ba; }
 </style>
 </head>
 <body>
@@ -115,7 +137,7 @@
       <span class="chip"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10" width="18" height="11" rx="1.8" fill="#f43f5e"/><rect x="2.4" y="6" width="19.2" height="4" rx="1.8" fill="#e11d48"/><rect x="10.8" y="6" width="2.4" height="15" fill="#fbbf24"/><path d="M12 6 C9 1.5 3.5 3.5 4.5 7.5 C5.5 10.5 10 9.5 12 6 Z" fill="#e11d48"/><path d="M12 6 C15 1.5 20.5 3.5 19.5 7.5 C18.5 10.5 14 9.5 12 6 Z" fill="#e11d48"/></svg><span>Подарок</span></span>
     </div>
   </header>
-  <p class="note">Строка 1 — курс доллара вводишь вручную (например, по P2P). Строка 2 — спотовая цена GRAM/USDT с Bybit автоматически. Строки 3–5 вводишь каждый раз.</p>
+  <p class="note">Строка 1 — курс доллара вводишь вручную (например, по P2P). Строка 2 — спотовая цена GRAM/USDT с Bybit автоматически. Строки 3–4 вводишь каждый раз. Строки 5–6 — цена входа и цена выхода: можно ввести руками, а можно оставить пустыми — тогда посчитается автоматически (значение подсказано в поле как «авто: …»).</p>
 
   <table>
     <tr><td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.2" y="2.2" width="19.6" height="19.6" rx="5.5" fill="#ea580c"/><text x="12" y="17.6" font-family="Segoe UI, Arial" font-weight="bold" font-size="11" fill="#fff" text-anchor="middle">₽</text></svg>1. Курс доллара к рублю</span><span class="sub">Вводишь вручную — например, актуальный курс P2P</span></td><td><input id="kurs" type="number" min="0" step="any" placeholder="0"></td></tr>
@@ -134,10 +156,19 @@
       <td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#16a34a"/><text x="12" y="17.2" font-family="Segoe UI, Arial" font-weight="bold" font-size="13" fill="#fff" text-anchor="middle">$</text></svg>4. Стоимость продажи (значение X)</span><span class="sub">Из X вычитается 10%, затем ещё 6%</span></td>
       <td><input id="x" type="number" min="0" step="any" placeholder="0"></td>
     </tr>
-    <tr><td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10" width="18" height="11" rx="1.8" fill="#f43f5e"/><rect x="2.4" y="6" width="19.2" height="4" rx="1.8" fill="#e11d48"/><rect x="10.8" y="6" width="2.4" height="15" fill="#fbbf24"/><path d="M12 6 C9 1.5 3.5 3.5 4.5 7.5 C5.5 10.5 10 9.5 12 6 Z" fill="#e11d48"/><path d="M12 6 C15 1.5 20.5 3.5 19.5 7.5 C18.5 10.5 14 9.5 12 6 Z" fill="#e11d48"/></svg>5. Название подарка</span></td><td><input id="gname" placeholder="Например: Бык Дикого леса"></td></tr>
+    <tr>
+      <td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="13" rx="3" fill="#0ea5e9"/><rect x="2.5" y="6" width="19" height="4.5" rx="2" fill="#0369a1"/><circle cx="17.6" cy="14" r="1.7" fill="#fff"/></svg>5. Цена входа, ₽</span><span class="sub">Сколько вложил. Пусто — считается как: монеты × цена GRAM × курс</span></td>
+      <td><input id="entry" type="number" min="0" step="any" placeholder="0"></td>
+    </tr>
+    <tr>
+      <td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#22c55e"/><path d="M12 16.5 V8 M8.6 11.2 L12 7.6 L15.4 11.2" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>6. Цена выхода, ₽</span><span class="sub">Сколько получу после комиссий 10% + 6%. Пусто — считается как: X минус 10%, затем минус 6%</span></td>
+      <td><input id="exit" type="number" min="0" step="any" placeholder="0"></td>
+    </tr>
+    <tr><td class="label"><span class="lbl"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10" width="18" height="11" rx="1.8" fill="#f43f5e"/><rect x="2.4" y="6" width="19.2" height="4" rx="1.8" fill="#e11d48"/><rect x="10.8" y="6" width="2.4" height="15" fill="#fbbf24"/><path d="M12 6 C9 1.5 3.5 3.5 4.5 7.5 C5.5 10.5 10 9.5 12 6 Z" fill="#e11d48"/><path d="M12 6 C15 1.5 20.5 3.5 19.5 7.5 C18.5 10.5 14 9.5 12 6 Z" fill="#e11d48"/></svg>7. Название подарка</span></td><td><input id="gname" placeholder="Например: Бык Дикого леса"></td></tr>
   </table>
 
-  <button onclick="add()">Рассчитать</button>
+  <button onclick="add()">Рассчитать и сохранить</button>
+  <p class="store-hint" id="storeHint"></p>
 
   <div id="result"></div>
 
@@ -152,70 +183,218 @@
   // Строка 2 — импортируется автоматически (GRAM/USDT с биржи).
   // Ниже запасное значение на случай отсутствия интернета/ошибки API:
   const CENA_MONETY_FALLBACK = 1.35;  // $ за 1 монету (GRAM)
+  // Комиссии при продаже (значение X → цена выхода):
+  const COMMISSION_1 = 0.10;          // первая комиссия — 10%
+  const COMMISSION_2 = 0.06;          // вторая комиссия — 6%
+  // Ключи локального хранилища браузера:
+  const STORAGE_KEY      = 'gramGiftsV1';  // список подарков (NFT)
+  const STORAGE_KEY_KURS = 'gramKursV1';   // введённый курс доллара
   // ================================================
 
   let cenaMonety = CENA_MONETY_FALLBACK; // актуальный курс монеты к доллару
-  const gifts = [];
+  let gifts = [];                        // [{id,name,entry,exit,diff,coins,x,kurs,cenaMonety,createdAt}]
+
+  // ============ ЛОКАЛЬНОЕ ХРАНИЛИЩЕ (localStorage) ============
+  function storageGet(key) {
+    try { return window.localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function storageSet(key, value) {
+    try { window.localStorage.setItem(key, value); return true; } catch (e) { return false; }
+  }
+  function saveGifts() {
+    const ok = storageSet(STORAGE_KEY, JSON.stringify(gifts));
+    const hint = document.getElementById('storeHint');
+    if (hint) {
+      hint.textContent = ok
+        ? '💾 Список хранится локально в этом браузере — перезагрузка страницы его не сбросит.'
+        : '⚠ Браузер блокирует локальное хранилище — список не сохранится.';
+    }
+    return ok;
+  }
+  function loadGifts() {
+    const raw = storageGet(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        gifts = parsed.filter(function (g) {
+          return g && typeof g.name === 'string' && g.name &&
+                 isFinite(g.entry) && isFinite(g.exit);
+        });
+      }
+    } catch (e) { gifts = []; }
+  }
 
   function load() {
-    document.getElementById('kurs').value = String(KURS_DOLLARA);
-    refreshGramRate();                          // загрузить курс сразу
+    loadGifts();                                // поднять сохранённый список
+    const savedKurs = parseFloat(storageGet(STORAGE_KEY_KURS));
+    const kursEl = document.getElementById('kurs');
+    kursEl.value = String(savedKurs > 0 ? savedKurs : KURS_DOLLARA);
+    kursEl.addEventListener('input', function () {
+      storageSet(STORAGE_KEY_KURS, this.value); // курс тоже запоминаем
+      syncChips();
+      updateHints();
+    });
+    refreshGramRate();                          // загрузить курс GRAM сразу
     setInterval(refreshGramRate, 60000);        // авто-обновление каждую минуту
+    renderList();                               // показать сохранённый список
+    saveGifts();                                // записать список и проверить хранилище
+    syncChips();
+    updateHints();
+  }
+
+  // Автосчёт цены входа: монеты × цена GRAM × курс ₽/$
+  function autoEntry() {
+    const coins = parseFloat(document.getElementById('coins').value);
+    const kurs  = parseFloat(document.getElementById('kurs').value);
+    if (!(coins > 0) || !(kurs > 0)) return 0;
+    return coins * cenaMonety * kurs;
+  }
+  // Автосчёт цены выхода: X минус 10%, затем минус 6%
+  function autoExit() {
+    const x = parseFloat(document.getElementById('x').value);
+    if (!(x > 0)) return 0;
+    return x * (1 - COMMISSION_1) * (1 - COMMISSION_2);
+  }
+  // Подсказки «авто: …» в полях цены входа/выхода
+  function updateHints() {
+    const entryEl = document.getElementById('entry');
+    const exitEl  = document.getElementById('exit');
+    const ae = autoEntry();
+    const ax = autoExit();
+    if (entryEl) entryEl.placeholder = ae > 0 ? ('авто: ' + fmt(ae)) : '0';
+    if (exitEl)  exitEl.placeholder  = ax > 0 ? ('авто: ' + fmt(ax)) : '0';
+  }
+
+  function showResult(html) {
+    document.getElementById('result').innerHTML = html;
   }
 
   function add() {
-    const coins = parseFloat(document.getElementById('coins').value);
-    const x     = parseFloat(document.getElementById('x').value);
-    const kurs  = parseFloat(document.getElementById('kurs').value);
-    const name  = document.getElementById('gname').value.trim();
+    const kursEl  = document.getElementById('kurs');
+    const coinsEl = document.getElementById('coins');
+    const xEl     = document.getElementById('x');
+    const entryEl = document.getElementById('entry');
+    const exitEl  = document.getElementById('exit');
+    const nameEl  = document.getElementById('gname');
 
-    if (!(kurs > 0) || !(coins > 0) || !(x > 0) || !name) {
-      document.getElementById('result').innerHTML =
-        '<div class="msg err">❌ Проверь строки 1, 3, 4 и 5 — введены некорректные значения.</div>';
+    const kurs  = parseFloat(kursEl.value);
+    const coins = parseFloat(coinsEl.value);
+    const x     = parseFloat(xEl.value);
+    const name  = nameEl.value.trim();
+
+    const entryManual = parseFloat(entryEl.value);
+    const exitManual  = parseFloat(exitEl.value);
+    const entry = entryManual > 0 ? entryManual : autoEntry();   // сколько вложил, ₽
+    const exit  = exitManual  > 0 ? exitManual  : autoExit();    // получу после комиссий, ₽
+
+    if (!name) {
+      showResult('<div class="msg err">❌ Укажи название подарка (строка 7).</div>');
+      return;
+    }
+    if (!(entry > 0)) {
+      showResult('<div class="msg err">❌ Не вижу цену входа: введи её в строке 5 или заполни строки 1–3 (курс, монеты).</div>');
+      return;
+    }
+    if (!(exit > 0)) {
+      showResult('<div class="msg err">❌ Не вижу цену выхода: введи её в строке 6 или заполни строку 4 (значение X).</div>');
       return;
     }
 
-    const salePrice = x * 0.9 * 0.94;                      // цена продажи после 10% и 6%
-    const cost      = coins * cenaMonety * kurs;          // потрачено в рублях
-    const diff      = salePrice - cost;                    // разница
+    const diff = exit - entry;                                   // разница, ₽
 
-    if (diff > 0) {
-      gifts.push({ name: name, diff: diff, salePrice: salePrice, cost: cost });
-      gifts.sort(function (a, b) { return b.diff - a.diff; }); // топ: больше разница — выше
-      document.getElementById('result').innerHTML =
-        '<div class="msg ok">✅ Подарок: <b>' + esc(name) + '</b> — разница <b>' + fmt(diff) +
-        ' ₽</b><br><span style="font-size:13px">Цена продажи: ' + fmt(salePrice) +
-        ' ₽ &nbsp;·&nbsp; Потрачено: ' + fmt(cost) + ' ₽</span></div>';
-    } else {
-      document.getElementById('result').innerHTML =
-        '<div class="msg no">⛔ <b>' + esc(name) + '</b> — разница ' + fmt(diff) +
-        ' ₽ (не положительная), в топ не попал.</div>';
-    }
-    renderTop();
+    gifts.push({
+      id: String(Date.now()) + '-' + Math.random().toString(36).slice(2, 8),
+      name: name,
+      entry: entry,
+      exit: exit,
+      diff: diff,
+      coins: coins > 0 ? coins : null,
+      x: x > 0 ? x : null,
+      kurs: kurs > 0 ? kurs : null,
+      cenaMonety: cenaMonety,
+      createdAt: new Date().toISOString()
+    });
+
+    saveGifts();                                                 // сохранить в localStorage
+    renderList();
     syncChips();
-    // Очистить строки 3–5 для следующего ввода
-    document.getElementById('coins').value = '';
-    document.getElementById('x').value = '';
-    document.getElementById('gname').value = '';
-    document.getElementById('coins').focus();
+
+    showResult('<div class="msg ' + (diff > 0 ? 'ok' : 'no') + '">' +
+      (diff > 0 ? '✅' : '⚠') + ' Подарок: <b>' + esc(name) + '</b> — разница <b>' + fmt(diff) +
+      ' ₽</b><br><span style="font-size:13px">Вход: ' + fmt(entry) +
+      ' ₽ &nbsp;·&nbsp; Выход после комиссий (' + Math.round(COMMISSION_1 * 100) + '% + ' +
+      Math.round(COMMISSION_2 * 100) + '%): ' + fmt(exit) + ' ₽</span></div>');
+
+    // Очистить строки 3–6 для следующего ввода (курс и цена GRAM остаются)
+    coinsEl.value = '';
+    xEl.value = '';
+    entryEl.value = '';
+    exitEl.value = '';
+    nameEl.value = '';
+    updateHints();
+    coinsEl.focus();
   }
 
-  function renderTop() {
+  function renderList() {
     const wrap = document.getElementById('topWrap');
-    if (!gifts.length) { wrap.innerHTML = ''; return; }
-    let html = '<h3>🏆 Топ подарков</h3><table><tr><th>#</th><th>Подарок</th><th>Разница</th></tr>';
-    gifts.forEach(function (g, i) {
-      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(g.name) + '</td><td><b>' + fmt(g.diff) + ' ₽</b></td></tr>';
+    if (!gifts.length) {
+      wrap.innerHTML = '<h3>🏆 Список подарков (NFT)</h3>' +
+        '<p class="note" style="margin:0">Пока пусто. Заполни таблицу и нажми «Рассчитать и сохранить» — подарок останется в списке даже после перезагрузки страницы.</p>';
+      return;
+    }
+
+    const sorted = gifts.slice().sort(function (a, b) { return b.diff - a.diff; });
+    let sumIn = 0, sumOut = 0, sumDiff = 0;
+
+    let html = '<h3>🏆 Список подарков (NFT) <span class="cnt">' + gifts.length + '</span></h3>' +
+      '<table><tr><th>#</th><th>Подарок</th><th>Вход, ₽</th><th>Выход, ₽</th><th>Разница, ₽</th><th></th></tr>';
+
+    sorted.forEach(function (g, i) {
+      sumIn   += g.entry;
+      sumOut  += g.exit;
+      sumDiff += g.diff;
+      html += '<tr>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td>' + esc(g.name) + '</td>' +
+        '<td>' + fmt(g.entry) + '</td>' +
+        '<td>' + fmt(g.exit) + '</td>' +
+        '<td class="' + (g.diff > 0 ? 'pos' : 'neg') + '"><b>' + fmt(g.diff) + '</b></td>' +
+        '<td><button type="button" class="del" title="Удалить подарок" onclick="removeGift(\'' + g.id + '\')">🗑</button></td>' +
+        '</tr>';
     });
+
+    html += '<tr class="totals"><td></td><td>Итого: ' + gifts.length + ' шт.</td>' +
+      '<td>' + fmt(sumIn) + '</td><td>' + fmt(sumOut) + '</td>' +
+      '<td class="' + (sumDiff > 0 ? 'pos' : 'neg') + '">' + fmt(sumDiff) + '</td><td></td></tr>';
     html += '</table>';
+    html += '<button type="button" class="clear" onclick="clearGifts()">Очистить весь список</button>';
+
     wrap.innerHTML = html;
   }
 
+  // Удалить один подарок (и из списка, и из локального хранилища)
+  function removeGift(id) {
+    gifts = gifts.filter(function (g) { return String(g.id) !== String(id); });
+    saveGifts();
+    renderList();
+  }
+
+  // Полностью очистить список
+  function clearGifts() {
+    if (!gifts.length) return;
+    if (!window.confirm('Удалить весь список подарков (' + gifts.length + ' шт.)? Отменить будет нельзя.')) return;
+    gifts = [];
+    saveGifts();
+    renderList();
+    showResult('');
+  }
+
   function fmt(v) {
-    return v.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return Number(v).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   function esc(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   // Показывает актуальные значения в иконках-чипсах шапки
@@ -260,6 +439,7 @@
         statusEl.textContent = '✓ Курс GRAM/USDT: $' + price +
           ' (источник: ' + src.name + ', ' + new Date().toLocaleTimeString('ru-RU') + ')';
         statusEl.style.color = '#166534';
+        if (typeof updateHints === 'function') updateHints();
         return;
       } catch (e) { /* пробуем следующий источник */ }
     }
@@ -269,6 +449,7 @@
     statusEl.textContent = '⚠ Ошибка загрузки курса — используется запасное значение $' +
       CENA_MONETY_FALLBACK + ' (Bybit, Binance и OKX недоступны)';
     statusEl.style.color = '#b45309';
+    if (typeof updateHints === 'function') updateHints();
   }
 
   load();
